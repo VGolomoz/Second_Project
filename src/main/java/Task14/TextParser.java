@@ -3,23 +3,34 @@ package Task14;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TextParser {
 
-    private Set<String> wordsList;
     private Set<String> palindromeList;
-    private ArrayList<String> maxPalindromes;
+    private List<String> maxPalindromes;
 
-    public void print() {
+    public void printMaxPalindrome() {
 
-        parseToWords(readText());
-        if (checkPalindrome()) {
+        parseToSentences(readText());
+        if (!palindromeList.isEmpty()) {
             findMaxPalindrome();
-            System.out.println("Palindromes: ");
+            System.out.println("Max length palindromes: ");
             for (String s : maxPalindromes) {
                 System.out.println(s);
             }
         } else System.err.println("There is no palindromes!");
+    }
+
+    public void printAllPalindromes() {
+        if (!palindromeList.isEmpty()) {
+            System.out.println("========================");
+            System.out.println("All finded palindromes: ");
+            for (String s : palindromeList) {
+                System.out.println(s);
+            }
+        }
     }
 
     private void findMaxPalindrome() {
@@ -39,22 +50,16 @@ public class TextParser {
         }
     }
 
-    private boolean checkPalindrome() {
+    private void checkPalindrome(String sentence) {
         palindromeList = new HashSet<>();
-        boolean flag = false;
-
-        for (String s : wordsList) {
-            int L = s.length();
-            for (int i = 1; i < L; ++i) {
-                for (int j = 0; j < (L - i); ++j) {
-                    String subs = s.substring(j, i + j + 1);
-                    if (isPalindrome(subs) && subs.length() > 1)
-                        palindromeList.add(subs);
-                }
+        int l = sentence.length();
+        for (int i = 0; i < l; ++i) {
+            for (int j = 0; j < (l - i); ++j) {
+                String subs = sentence.substring(j, i + j + 1);
+                if (isPalindrome(subs) && subs.length() > 1)
+                    palindromeList.add(subs);
             }
         }
-        if (!palindromeList.isEmpty()) flag = true;
-        return flag;
     }
 
     private boolean isPalindrome(String s) {
@@ -64,16 +69,15 @@ public class TextParser {
         return false;
     }
 
-    private void parseToWords(String text) {
+    private void parseToSentences(String text) {
 
-        wordsList = new HashSet<>();
-
-        String[] words = text.split(" ");
-
-        for (String word : words) {
-            if (word.length() > 1)
-                wordsList.add(word);
+        Pattern pattertSentence = Pattern.compile("([^(\\.|!|\\?)]+)(\\.|!|\\?)");
+        Matcher matcher = pattertSentence.matcher(text);
+        StringBuilder sentence = new StringBuilder();
+        while (matcher.find()) {
+            sentence.append(matcher.group());
         }
+        checkPalindrome(sentence.toString().trim().replaceAll("[.-]", "").replaceAll("\\s+", " ").toLowerCase());
     }
 
     private String readText() {
@@ -82,13 +86,13 @@ public class TextParser {
             FileReader fr = new FileReader("Task1.txt");
             Scanner in = new Scanner(fr);
             while (in.hasNext()) {
-                text.append(in.nextLine().replaceAll("[^а-яА-Яa-zA-Z]", " ")
-                        .replaceAll("(\\s+)|(\\t)|(\\n)|(\\r)|(\\f)|(\\u0085)|(\\u2028)|(\\u2029)", " "));
+                text.append(in.nextLine().replaceAll("[^а-яА-Яa-zA-Z.!?'-]", " ")
+                        .replaceAll("(\\t)&(\\n)&(\\r)&(\\f)&(\\u0085)&(\\u2028)&(\\u2029)", " "));
             }
         } catch (FileNotFoundException e) {
             System.err.println("File not found");
         }
         /*System.out.println(text);*/
-        return text.toString().trim();
+        return text.toString();
     }
 }

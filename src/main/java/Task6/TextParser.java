@@ -51,7 +51,7 @@ public class TextParser {
             FileReader fr = new FileReader("Task1.txt");
             Scanner in = new Scanner(fr);
             while (in.hasNext()) {
-                text.append(in.nextLine().replaceAll("[^а-яА-Яa-zA-Z]", " ")
+                text.append(in.nextLine().replaceAll("\\s-\\s", " ").replaceAll("[^а-яА-Яa-zA-Z-']", " ")
                         .replaceAll("(\\s+)|(\\t)|(\\n)|(\\r)|(\\f)|(\\u0085)|(\\u2028)|(\\u2029)", " "));
             }
         } catch (FileNotFoundException e) {
